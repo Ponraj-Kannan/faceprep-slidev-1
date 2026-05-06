@@ -95,7 +95,7 @@ const helloCode = `public class Main {
   </div>
 
   <div class="box6" >
-    <Runner/>
+    <JavaRunner/>
     <div  class="box7" >
 ````md magic-move {duration:500}
 ```java
