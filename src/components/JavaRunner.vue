@@ -15,16 +15,25 @@ if (typeof window !== 'undefined') {
 // Proxy routes `/api/run` locally to bypass CORS and injects key; Vercel routes it to serverless func in prod.
 const API_URL = '/api/run'
 
+// const STARTER_CODE = {
+//   java:   'public class Main\n{\n    public static void main(String[] args)\n    {\n        // Write your code here\n    }\n}',
+//   cpp:    '#include <iostream>\nusing namespace std;\n\nint main()\n{\n    // Write your code here\n    return 0;\n}',
+//   python: '# Write your code here',
+//   c : '#include <stdio.h>\n\nint main()\n{\n    // Write your code here\n    return 0;\n}'
+// }
+
 const STARTER_CODE = {
-  java:   'public class Main {\n    public static void main(String[] args) {\n        // Write your code here\n    }\n}',
-  cpp:    '#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your code here\n    return 0;\n}',
-  python: '# Write your code here'
+  java:   '// Write your code',
+  cpp:    '// Write your code',
+  python: '# Write your code',
+  c : '// Write your code'
 }
 
 const LANGUAGE_META = {
   java:   { label: 'Java',   filename: 'Main.java',  monaco: 'java',   pytutor: 'java'   },
   cpp:    { label: 'C++',    filename: 'main.cpp',   monaco: 'cpp',    pytutor: 'cpp'    },
-  python: { label: 'Python', filename: 'main.py',    monaco: 'python', pytutor: '3'      }
+  python: { label: 'Python', filename: 'main.py',    monaco: 'python', pytutor: '3'      },
+  c:      { label: 'C',      filename: 'main.c',     monaco: 'cpp',      pytutor: 'cpp'      }
 }
 
 // ── Pyodide (run Python in-browser via WebAssembly) ──────────────────────────
@@ -271,8 +280,11 @@ const executeCode = async () => {
     const res = await fetch(API_URL, {
       method: 'POST',
       headers,
-      body: JSON.stringify({ code, input: input.value, language: selectedLanguage.value })
+      body: JSON.stringify({ code, input: input.value, language: 
+        (selectedLanguage.value === 'c') ? 'cpp' : selectedLanguage.value
+       })
     })
+    console.log({ code, input: input.value, language: selectedLanguage.value });
 
     let data = {}
     try { data = await res.json() } catch (e) {}
@@ -332,9 +344,9 @@ const executeCode = async () => {
             <button class="icon-btn" @click="changeFontSize(1)" title="Increase Font">
               <div class="i-lucide-plus"></div>
             </button>
-            <button class="icon-btn" @click="toggleWordWrap" :class="{ 'wrap-active': wordWrap === 'on' }" title="Toggle Word Wrap">
+            <!-- <button class="icon-btn" @click="toggleWordWrap" :class="{ 'wrap-active': wordWrap === 'on' }" title="Toggle Word Wrap">
               <div class="i-lucide-wrap-text"></div>
-            </button>
+            </button> -->
           </div>
 
           <!-- Language Selector -->
@@ -397,13 +409,14 @@ const executeCode = async () => {
 
 <style scoped>
 .java-runner {
-  width: 60%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   font-size: 10px;
 }
 
 .editor-wrapper {
+  width:100%;
   display: flex;
   flex-direction: column;
   border: 1px solid #cbd5e1;
@@ -411,13 +424,16 @@ const executeCode = async () => {
 }
 
 .mac-header {
+  width: 100%;
   border-radius: 5px 5px 0px 0px;
   background-color: #537D96;
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 7px 12px;
+  flex-wrap: wrap;
 }
 
 /* Left group: dots + filename — never shrinks or wraps */
